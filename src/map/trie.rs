@@ -1,5 +1,5 @@
 //! A trie map stores a value with each word or key.
-use super::Trie;
+use super::{Trie, TrieNode};
 use crate::inc_search::IncSearch;
 use crate::iter::{PostfixIter, PrefixIter, SearchIter};
 use crate::try_collect::{TryCollect, TryFromIterator};
@@ -258,12 +258,6 @@ where
         }
         builder.build()
     }
-}
-
-/// A wrapper around the Louds nodes of a trie
-pub struct TrieNode<'a, Label, Value> {
-    trie: &'a Trie<Label, Value>,
-    node_num: LoudsNodeNum 
 }
 
 impl<Label: Ord, Value> TrieNode<'_, Label, Value> {

@@ -1,6 +1,6 @@
 //! A trie that maps sequence of `Label`s to a `Value`.
 use crate::internal_data_structure::naive_trie::NaiveTrie;
-use louds_rs::Louds;
+use louds_rs::{Louds, LoudsNodeNum};
 
 mod trie;
 mod trie_builder;
@@ -33,4 +33,13 @@ pub struct TrieBuilder<Label, Value> {
 struct TrieLabel<Label, Value> {
     label: Label,
     value: Option<Value>,
+}
+
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "mem_dbg", derive(mem_dbg::MemDbg, mem_dbg::MemSize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// A wrapper around the Louds nodes of a [Trie].
+pub struct TrieNode<'a, Label, Value> {
+    trie: &'a Trie<Label, Value>,
+    node_num: LoudsNodeNum 
 }
