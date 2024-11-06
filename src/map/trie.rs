@@ -235,6 +235,11 @@ impl<Label: Ord, Value> Trie<Label, Value> {
     pub(crate) fn child_to_ancestors(&self, node_num: LoudsNodeNum) -> AncestorNodeIter {
         self.louds.child_to_ancestors(node_num)
     }
+
+    /// Return the root node
+    pub fn root(&self) -> TrieNode<Label, Value> {
+        TrieNode { trie: &self, node_num: LoudsNodeNum(1)}
+    }
 }
 
 impl<Label, Value, C> FromIterator<(C, Value)> for Trie<Label, Value>
@@ -254,6 +259,40 @@ where
         builder.build()
     }
 }
+
+/// A wrapper around the Louds nodes of a trie
+pub struct TrieNode<'a, Label, Value> {
+    trie: &'a Trie<Label, Value>,
+    node_num: LoudsNodeNum 
+}
+
+impl<Label: Ord, Value> TrieNode<'_, Label, Value> {
+    /// Returns the label of this node
+    pub fn label(&self) -> &Label {
+        self.trie.label(self.node_num)
+    }
+
+    /// Returns the value of this node
+    pub fn value(&self) ->  Option<&Value> {
+        self.trie.value(self.node_num)
+    }
+
+    /// Returns whether this node is terminal
+    pub fn is_terminal(&self) -> bool {
+        self.trie.is_terminal(self.node_num)
+    }
+
+    /// Returns a vector of the children of this node
+    pub fn children(&self) -> Vec<TrieNode<Label, Value>> {
+        self.trie.children_node_nums(self.node_num).map(|n| TrieNode {trie: self.trie, node_num: n}).collect()
+    }
+
+    /// Returns a vector of the ancestors of this node
+    pub fn ancestors(&self) -> Vec<TrieNode<Label, Value>> {
+        self.trie.child_to_ancestors(self.node_num).map(|n| TrieNode {trie: self.trie, node_num: n}).collect()
+    }
+}
+
 
 #[cfg(test)]
 mod search_tests {
