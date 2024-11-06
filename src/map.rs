@@ -36,8 +36,6 @@ struct TrieLabel<Label, Value> {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "mem_dbg", derive(mem_dbg::MemDbg, mem_dbg::MemSize))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// A wrapper around the Louds nodes of a [Trie].
 pub struct TrieNode<'a, Label, Value> {
     trie: &'a Trie<Label, Value>,
