@@ -5,7 +5,7 @@ use crate::iter::{PostfixIter, PrefixIter, SearchIter};
 use crate::try_collect::{TryCollect, TryFromIterator};
 use louds_rs::{AncestorNodeIter, ChildNodeIter, LoudsNodeNum};
 use std::iter::FromIterator;
-use std::rc::Rc;
+use std::sync::Arc;
 
 impl<Label: Ord, Value> Trie<Label, Value> {
     /// Return `Some(&Value)` if query is an exact match.
@@ -259,11 +259,11 @@ where
 impl<Label: Ord, Value> TrieNode<Label, Value> {
     /// Consumes a [Trie] and returns the root note of that trie
     pub fn from_trie(trie: Trie<Label, Value>) -> TrieNode<Label, Value> {
-        TrieNode::from_rc_trie(Rc::new(trie))
+        TrieNode::from_arc_trie(Arc::new(trie))
     }
 
     /// Produces the root node from a [Trie] wrapped in an [Rc]
-    pub fn from_rc_trie(trie: Rc<Trie<Label, Value>>) -> TrieNode<Label, Value> {
+    pub fn from_arc_trie(trie: Arc<Trie<Label, Value>>) -> TrieNode<Label, Value> {
         TrieNode {
             trie: trie.clone(), 
             node_num: LoudsNodeNum(1),
