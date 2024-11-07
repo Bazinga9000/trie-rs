@@ -257,10 +257,15 @@ where
 }
 
 impl<Label: Ord, Value> TrieNode<Label, Value> {
-    /// Consumes a trie, and returns the root note of that trie
+    /// Consumes a [Trie] and returns the root note of that trie
     pub fn from_trie(trie: Trie<Label, Value>) -> TrieNode<Label, Value> {
+        TrieNode::from_rc_trie(Rc::new(trie))
+    }
+
+    /// Produces the root node from a [Trie] wrapped in an [Rc]
+    pub fn from_rc_trie(trie: Rc<Trie<Label, Value>>) -> TrieNode<Label, Value> {
         TrieNode {
-            trie: Rc::new(trie), 
+            trie: trie.clone(), 
             node_num: LoudsNodeNum(1),
         }
     }
