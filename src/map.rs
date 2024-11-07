@@ -1,4 +1,6 @@
 //! A trie that maps sequence of `Label`s to a `Value`.
+use std::rc::Rc;
+
 use crate::internal_data_structure::naive_trie::NaiveTrie;
 use louds_rs::{Louds, LoudsNodeNum};
 
@@ -37,7 +39,7 @@ struct TrieLabel<Label, Value> {
 
 #[derive(Debug, Clone)]
 /// A wrapper around the Louds nodes of a [Trie].
-pub struct TrieNode<'a, Label, Value> {
-    trie: &'a Trie<Label, Value>,
+pub struct TrieNode<Label, Value> {
+    trie: Rc<Trie<Label, Value>>,
     node_num: LoudsNodeNum 
 }

@@ -5,6 +5,7 @@ use crate::iter::{PostfixIter, PrefixIter, SearchIter};
 use crate::try_collect::{TryCollect, TryFromIterator};
 use louds_rs::{AncestorNodeIter, ChildNodeIter, LoudsNodeNum};
 use std::iter::FromIterator;
+use std::rc::Rc;
 
 impl<Label: Ord, Value> Trie<Label, Value> {
     /// Return `Some(&Value)` if query is an exact match.
@@ -235,11 +236,6 @@ impl<Label: Ord, Value> Trie<Label, Value> {
     pub(crate) fn child_to_ancestors(&self, node_num: LoudsNodeNum) -> AncestorNodeIter {
         self.louds.child_to_ancestors(node_num)
     }
-
-    /// Return the root node
-    pub fn root(&self) -> TrieNode<Label, Value> {
-        TrieNode { trie: &self, node_num: LoudsNodeNum(1)}
-    }
 }
 
 impl<Label, Value, C> FromIterator<(C, Value)> for Trie<Label, Value>
@@ -260,7 +256,23 @@ where
     }
 }
 
-impl<Label: Ord, Value> TrieNode<'_, Label, Value> {
+impl<Label: Ord, Value> TrieNode<Label, Value> {
+    /// Consumes a trie, and returns the root note of that trie
+    pub fn from_trie(trie: Trie<Label, Value>) -> TrieNode<Label, Value> {
+        TrieNode {
+            trie: Rc::new(trie), 
+            node_num: LoudsNodeNum(1),
+        }
+    }
+
+    /// Return the root node of the associated trie
+    pub fn to_root(&self) -> TrieNode<Label, Value> {
+        TrieNode {
+            trie: self.trie.clone(),
+            node_num: LoudsNodeNum(1)
+        }
+    }
+
     /// Returns the label of this node
     pub fn label(&self) -> &Label {
         self.trie.label(self.node_num)
@@ -278,12 +290,12 @@ impl<Label: Ord, Value> TrieNode<'_, Label, Value> {
 
     /// Returns a vector of the children of this node
     pub fn children(&self) -> Vec<TrieNode<Label, Value>> {
-        self.trie.children_node_nums(self.node_num).map(|n| TrieNode {trie: self.trie, node_num: n}).collect()
+        self.trie.children_node_nums(self.node_num).map(|n| TrieNode {trie: self.trie.clone(), node_num: n}).collect()
     }
 
     /// Returns a vector of the ancestors of this node
     pub fn ancestors(&self) -> Vec<TrieNode<Label, Value>> {
-        self.trie.child_to_ancestors(self.node_num).map(|n| TrieNode {trie: self.trie, node_num: n}).collect()
+        self.trie.child_to_ancestors(self.node_num).map(|n| TrieNode {trie: self.trie.clone(), node_num: n}).collect()
     }
 }
 
